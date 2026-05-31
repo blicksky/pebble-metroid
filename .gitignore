@@ -1,0 +1,14 @@
+# Pebble build artifacts
+build/
+.lock-waf*
+*.pbw
+
+# Packaging zip files
+pebble-metroid.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node dependencies (if any)
+node_modules/

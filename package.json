@@ -1,0 +1,32 @@
+{
+  "name": "pebble-metroid",
+  "author": "Andrew Blick",
+  "version": "1.0.0",
+  "description": "Super Metroid themed watchface for Pebble Time 2 (Emery)",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Metroid",
+    "uuid": "4c8f2b3e-7a91-4c6e-b152-78d1052fb58d",
+    "projectType": "moddable",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": ["emery"],
+    "watchapp": {
+      "watchface": true
+    },
+    "messageKeys": [],
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "IMAGE_STATUS_HUD",
+          "file": "Pebble Super Metroid Status.png",
+          "memoryFormat": "SmallestPalette",
+          "spaceOptimization": "memory"
+        }
+      ]
+    }
+  }
+}
