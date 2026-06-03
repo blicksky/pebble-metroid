@@ -3,7 +3,9 @@
   "author": "Andrew Blick",
   "version": "1.0.0",
   "description": "Super Metroid themed watchface for Pebble Time 2 (Emery)",
-  "keywords": ["pebble-app"],
+  "keywords": [
+    "pebble-app"
+  ],
   "private": true,
   "dependencies": {},
   "pebble": {
@@ -12,7 +14,9 @@
     "projectType": "moddable",
     "sdkVersion": "3",
     "enableMultiJS": true,
-    "targetPlatforms": ["emery"],
+    "targetPlatforms": [
+      "emery"
+    ],
     "watchapp": {
       "watchface": true
     },
