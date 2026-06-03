@@ -18,8 +18,11 @@ const statusHudBitmap = new Poco.PebbleBitmap(1);
 // Load the custom status bar numbers PNG image from resources (Resource ID 2)
 const statusBarNumbersBitmap = new Poco.PebbleBitmap(2);
 
-// Initialize Battery Sensor (deferred to event loop)
+// Initialize Battery Sensor
 let battery;
+
+// TODO consider moving this into an object with other similar state
+let lastBatteryPercent = 0;
 
 function drawBackground() {
     render.drawBitmap(statusHudBitmap, 0, 0);
@@ -39,15 +42,7 @@ function drawTime(now) {
 }
 
 function drawBattery() {
-    let batteryPercent = 0;
-    if (battery) {
-        try {
-            const batterySample = battery.sample();
-            batteryPercent = batterySample ? batterySample.percent : 0;
-        } catch (err) {
-            // Fail-silent if sensor reading errors
-        }
-    }
+    let batteryPercent = lastBatteryPercent;
     if (batteryPercent > 100) batteryPercent = 100;
 
     const hundreds = Math.floor(batteryPercent / 100);
@@ -88,9 +83,19 @@ function draw(e) {
 try {
     battery = new Battery({
         onSample() {
-            draw();
+            const sample = this.sample();
+            if (sample && sample.percent !== undefined) {
+                lastBatteryPercent = sample.percent;
+                draw();
+            }
         }
     });
+
+    // Populate initial state immediately
+    const initialSample = battery.sample();
+    if (initialSample && initialSample.percent !== undefined) {
+        lastBatteryPercent = initialSample.percent;
+    }
 } catch (err) {
     // Fail-silent if hardware/sensor is not available during start
 }
