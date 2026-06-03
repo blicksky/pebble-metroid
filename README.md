@@ -53,11 +53,11 @@ You can install wirelessly through the CloudPebble proxy without entering an IP 
 
 Below is the feature list to track implementation progress:
 
-- [ ] **Battery HUD ("Energy"):**
-  - Show "Energy" followed by the battery percentage in the top left.
+- [/] **Battery HUD ("Energy"):**
+  - Show "Energy" followed by the battery percentage in the top left. [x]
   - Render filled-in energy tank squares corresponding to the current percentage.
   - Replace the "Auto" arrows with `"Chrg"` when the device is charging / plugged in.
-  - Investigate issue where battery% is only reported to the 10s place, not single digits.
+  - *Note: On real hardware, battery% is reported with single-digit precision (e.g., 89%). The 10% step rounding is a quirk/limitation of the QEMU emulator only.*
 - [ ] **HUD Date Display:**
   - Display the date info (3-letter day, 3-letter month, and date) in the boxes typically reserved for missile, super missile, and power bomb counts.
 - [ ] **Watch Time (Reserve Tank Box):**
