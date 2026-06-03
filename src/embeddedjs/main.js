@@ -1,4 +1,5 @@
 import Poco from "commodetto/Poco";
+import Battery from "embedded:sensor/Battery";
 
 const render = new Poco(screen);
 
@@ -14,49 +15,85 @@ const labelFont = new render.Font("Gothic-Regular", 14);
 
 // Load the custom Super Metroid status HUD PNG image from resources (Resource ID 1)
 const statusHudBitmap = new Poco.PebbleBitmap(1);
+// Load the custom status bar numbers PNG image from resources (Resource ID 2)
+const statusBarNumbersBitmap = new Poco.PebbleBitmap(2);
+
+// Initialize Battery Sensor (deferred to event loop)
+let battery;
+
+function drawBackground() {
+    render.drawBitmap(statusHudBitmap, 0, 0);
+}
+
+function drawTime(now) {
+    const hours = now.getHours();
+    const formattedHours = String(hours).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const timeString = `${formattedHours}:${minutes}`;
+
+    const timeWidth = render.getTextWidth(timeString, timeFont);
+    const clockX = (render.width - timeWidth) / 2;
+    const clockY = 4; // Moved even closer to the top edge!
+
+    render.drawText(timeString, timeFont, textWhite, clockX, clockY);
+}
+
+function drawBattery() {
+    let batteryPercent = 0;
+    if (battery) {
+        try {
+            const batterySample = battery.sample();
+            batteryPercent = batterySample ? batterySample.percent : 0;
+        } catch (err) {
+            // Fail-silent if sensor reading errors
+        }
+    }
+    if (batteryPercent > 100) batteryPercent = 100;
+
+    const hundreds = Math.floor(batteryPercent / 100);
+    const tens = Math.floor((batteryPercent % 100) / 10);
+    const ones = batteryPercent % 10;
+
+    if (hundreds > 0) {
+        render.drawBitmap(statusBarNumbersBitmap, 49 - 8, 15, hundreds * 9, 0, 8, 8);
+    }
+    render.drawBitmap(statusBarNumbersBitmap, 49, 15, tens * 9, 0, 8, 8);
+    render.drawBitmap(statusBarNumbersBitmap, 49 + 8, 15, ones * 9, 0, 8, 8);
+}
+
+function drawFooter(now) {
+    const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+    const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+    const dayName = DAYS[now.getDay()];
+    const monthName = MONTHS[now.getMonth()];
+    const dateString = `${dayName}, ${monthName} ${now.getDate()}`;
+
+    render.drawText(dateString, labelFont, samusOrange, 10, render.height - 25);
+    render.drawText("MISSION ACTIVE", labelFont, energyBlue, render.width - 110, render.height - 25);
+}
 
 function draw(e) {
     const now = (e && e.date) ? e.date : new Date();
 
     render.begin();
-    // --- SUPER METROID HUD STRUCTURE ---
-    
-    // Draw the custom status HUD bitmap from resources (fits full 200x228 screen)
-    render.drawBitmap(statusHudBitmap, 0, 0);
-    
-    // --- TIME DISPLAY AT THE TOP ---
-    const hours = now.getHours();
-    const formattedHours = String(hours).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const timeString = `${formattedHours}:${minutes}`;
-    
-    // Center-align the full time string horizontally at the top of the screen
-    const timeWidth = render.getTextWidth(timeString, timeFont);
-    const clockX = (render.width - timeWidth) / 2;
-    const clockY = 4; // Moved even closer to the top edge!
-    
-    render.drawText(timeString, timeFont, textWhite, clockX, clockY);
-
-    // --- BOTTOM HUD SECTION (Date and Mission Status) ---
-    
-    // Draw Date String (e.g. "SAT, MAY 30")
-    const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-    const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-    
-    const dayName = DAYS[now.getDay()];
-    const monthName = MONTHS[now.getMonth()];
-    const dateString = `${dayName}, ${monthName} ${now.getDate()}`;
-    
-    render.drawText(dateString, labelFont, samusOrange, 10, render.height - 25);
-    render.drawText("MISSION ACTIVE", labelFont, energyBlue, render.width - 110, render.height - 25);
-
+    drawBackground();
+    drawTime(now);
+    drawBattery();
+    drawFooter(now);
     render.end();
 }
 
-// Register the event listener and trigger the initial draw safely inside the event loop!
-// Deferring this to the event loop prevents graphics engine freezes and watchdog crashes
-// when loading/drawing large bitmap resources during engine startup.
-setTimeout(() => {
-    watch.addEventListener("minutechange", draw);
-}, 0);
+// Initialize Battery Sensor
+try {
+    battery = new Battery({
+        onSample() {
+            draw();
+        }
+    });
+} catch (err) {
+    // Fail-silent if hardware/sensor is not available during start
+}
+
+watch.addEventListener("minutechange", draw);
 

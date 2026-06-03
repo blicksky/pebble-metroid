@@ -57,6 +57,7 @@ Below is the feature list to track implementation progress:
   - Show "Energy" followed by the battery percentage in the top left.
   - Render filled-in energy tank squares corresponding to the current percentage.
   - Replace the "Auto" arrows with `"Chrg"` when the device is charging / plugged in.
+  - Investigate issue where battery% is only reported to the 10s place, not single digits.
 - [ ] **HUD Date Display:**
   - Display the date info (3-letter day, 3-letter month, and date) in the boxes typically reserved for missile, super missile, and power bomb counts.
 - [ ] **Watch Time (Reserve Tank Box):**
@@ -70,3 +71,30 @@ Below is the feature list to track implementation progress:
 - [ ] **Sensor Display (Requires custom C-bindings):**
   - Display Step Count in the HUD box pointing to Samus' boots.
   - Display Heart Rate in the HUD box pointing to Samus' chest.
+
+## Graphic Asset Export & Pebble Color Quantization
+
+Pebble watchfaces compile images to the **GColor8** palette (64 native colors). When designing assets in tools like Photopea or Photoshop, you may encounter issues where colors that appear identical in your editor shift or mismatch after export:
+
+### The Issue
+- **Photopea Exporter Compression:** When exporting a PNG, Photopea may try to optimize file size by reducing the palette bit-depth (e.g., to a 2-bit or 4-bit indexed PNG). This lossy quantization shifts hex values (such as rounding the pure Pebble blue `#0000aa` `(0, 0, 170)` to a different blue like `#283888` `(40, 56, 136)`).
+- **Quantization Shift:** When the Pebble SDK compiles these PNGs, it matches non-native colors to the nearest GColor8 equivalents, resulting in different blue tones on screen.
+
+### How to Fix
+1. **Use 100% Quality:** In the Photopea export dialog, ensure the **Quality** slider is set to **100%** to prevent lossy palette reduction.
+2. **Correcting Palettes via Script:** If the color indexing has already shifted, you can use the palette fixer script located at `scratch/fix_palette.py` to programmatically rewrite the PNG's `PLTE` chunk bytes back to exact Pebble GColor8 colors:
+   ```bash
+   python3 scratch/fix_palette.py resources/Status_Bar_Numbers.png
+   ```
+
+## Moddable Emulator Hangs & Boot Loops
+
+When developing Alloy watchfaces, you might encounter emulator freezes or socket connection deadlocks:
+
+- **The Issue:** If the watchface crashes or boot loops (e.g., due to static instantiation of a sensor or a module resolution error), the Pebble emulator (`qemu-pebble`) becomes unresponsive, and subsequent `pebble install` commands will hang indefinitely waiting for the QEMU control socket connection.
+- **The Fix:** Run a full reset of the emulator processes and flash state to clear the crash-looping watchface:
+  ```bash
+  pebble kill && pebble wipe
+  ```
+  After wiping, run `pebble install --emulator emery` to launch a clean emulator instance and redeploy.
+
