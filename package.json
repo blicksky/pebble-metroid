@@ -33,7 +33,7 @@
         {
           "type": "bitmap",
           "name": "IMAGE_STATUS_BAR_NUMBERS",
-          "file": "Status Bar Numbers.png",
+          "file": "Battery Sprites.png",
           "memoryFormat": "SmallestPalette",
           "spaceOptimization": "memory"
         }

@@ -55,7 +55,7 @@ Below is the feature list to track implementation progress:
 
 - [/] **Battery HUD ("Energy"):**
   - Show "Energy" followed by the battery percentage in the top left. [x]
-  - Render filled-in energy tank squares corresponding to the current percentage.
+  - Render filled-in energy tank squares corresponding to the current percentage. [x]
   - Replace the "Auto" arrows with `"Chrg"` when the device is charging / plugged in.
   - *Note: On real hardware, battery% is reported with single-digit precision (e.g., 89%). The 10% step rounding is a quirk/limitation of the QEMU emulator only.*
 - [ ] **HUD Date Display:**

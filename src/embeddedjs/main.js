@@ -15,8 +15,8 @@ const labelFont = new render.Font("Gothic-Regular", 14);
 
 // Load the custom Super Metroid status HUD PNG image from resources (Resource ID 1)
 const statusHudBitmap = new Poco.PebbleBitmap(1);
-// Load the custom status bar numbers PNG image from resources (Resource ID 2)
-const statusBarNumbersBitmap = new Poco.PebbleBitmap(2);
+// Load the custom battery sprites PNG image from resources (Resource ID 2)
+const batterySpritesBitmap = new Poco.PebbleBitmap(2);
 
 // Initialize Battery Sensor
 let battery;
@@ -45,15 +45,33 @@ function drawBattery() {
     let batteryPercent = lastBatteryPercent;
     if (batteryPercent > 100) batteryPercent = 100;
 
+    // --- DRAW ENERGY TANKS ---
+    const filledTanksCount = Math.floor(batteryPercent * 14 / 100);
+    const tankWidth = 8;
+    const spacer = 0;
+    const startX = 8;
+    const bottomY = 8;
+    const topY = 1;
+
+    for (let i = 0; i < filledTanksCount; i++) {
+        const isTopRow = i >= 7;
+        const col = isTopRow ? (i - 7) : i;
+        const x = startX + col * (tankWidth + spacer);
+        const y = isTopRow ? topY : bottomY;
+
+        render.drawBitmap(batterySpritesBitmap, x, y, 90, 0, 8, 8);
+    }
+
+    // --- DRAW BATTERY PERCENTAGE DIGITS ---
     const hundreds = Math.floor(batteryPercent / 100);
     const tens = Math.floor((batteryPercent % 100) / 10);
     const ones = batteryPercent % 10;
 
     if (hundreds > 0) {
-        render.drawBitmap(statusBarNumbersBitmap, 49 - 8, 15, hundreds * 9, 0, 8, 8);
+        render.drawBitmap(batterySpritesBitmap, 49 - 8, 15, hundreds * 9, 0, 8, 8);
     }
-    render.drawBitmap(statusBarNumbersBitmap, 49, 15, tens * 9, 0, 8, 8);
-    render.drawBitmap(statusBarNumbersBitmap, 49 + 8, 15, ones * 9, 0, 8, 8);
+    render.drawBitmap(batterySpritesBitmap, 49, 15, tens * 9, 0, 8, 8);
+    render.drawBitmap(batterySpritesBitmap, 49 + 8, 15, ones * 9, 0, 8, 8);
 }
 
 function drawFooter(now) {
