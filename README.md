@@ -68,6 +68,12 @@ Below is the feature list to track implementation progress:
     - Power Suit theme
     - Varia Suit theme
     - Dynamic suit change (Power Suit during AM, Varia Suit during PM).
+    - Tie dynamic suit swaps to the game progression timeline (so the suit changes when Samus gets it in the game).
+- [ ] **HUD Box Custom Fonts:**
+  - Provide custom retro/pixel fonts for the HUD box titles (e.g. "TIME").
+- [ ] **Minimap Display:**
+  - Show a map in the top-right corner of the watchface.
+  - Update the map every minute to show progress along the game's timeline.
 - [ ] **Sensor Display (Requires custom C-bindings):**
   - Display Step Count in the HUD box pointing to Samus' boots.
   - Display Heart Rate in the HUD box pointing to Samus' chest.

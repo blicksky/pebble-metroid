@@ -36,6 +36,13 @@
           "file": "Battery Sprites.png",
           "memoryFormat": "SmallestPalette",
           "spaceOptimization": "memory"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_BOX_SPRITES",
+          "file": "Box Sprites.png",
+          "memoryFormat": "SmallestPalette",
+          "spaceOptimization": "memory"
         }
       ]
     }
