@@ -2,6 +2,9 @@
 
 A Super Metroid status HUD watchface for the Pebble Time 2 (Emery platform), built with Pebble Alloy and Moddable JavaScript.
 
+Refer to the [Rebble Developer Documentation](https://developer.rebble.io/docs/) for Pebble SDK APIs and reference guides.
+
+
 ## Development Steps
 
 ### 1. Build the App
@@ -74,8 +77,8 @@ Below is the feature list to track implementation progress:
 - [ ] **Minimap Display:**
   - Show a map in the top-right corner of the watchface.
   - Update the map every minute to show progress along the game's timeline.
-- [ ] **Sensor Display (Requires custom C-bindings):**
-  - Display Step Count in the HUD box pointing to Samus' boots.
+- [/] **Sensor Display (Requires custom C-bindings):**
+  - Display Step Count in the HUD box pointing to Samus' boots. [x]
   - Display Heart Rate in the HUD box pointing to Samus' chest.
 
 ## Graphic Asset Export & Pebble Color Quantization

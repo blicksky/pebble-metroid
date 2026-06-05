@@ -1,5 +1,6 @@
 import Poco from "commodetto/Poco";
 import Battery from "embedded:sensor/Battery";
+import Message from "pebble/message";
 
 const render = new Poco(screen);
 
@@ -13,6 +14,7 @@ const blackColor = render.makeColor(0, 0, 0);
 // Load built-in watch fonts (Leco-Bold is a sleek monospace font available in Alloy at size 20)
 const timeFont = new render.Font("Leco-Bold", 20);
 const labelFont = new render.Font("Gothic-Regular", 14);
+const stepsFont = new render.Font("Gothic-Bold", 18);
 const titleFont = new render.Font("Gothic-Regular", 9);
 
 // Load the custom Super Metroid status HUD PNG image from resources (Resource ID 1)
@@ -22,8 +24,9 @@ const batterySpritesBitmap = new Poco.PebbleBitmap(2);
 // Load the custom box sprites PNG image from resources (Resource ID 3)
 const boxSpritesBitmap = new Poco.PebbleBitmap(3);
 
-// Initialize Battery Sensor
+// Initialize Sensors
 let battery;
+let steps = 0;
 
 // TODO consider moving this into an object with other similar state
 let lastBatteryPercent = 0;
@@ -118,6 +121,22 @@ function drawTime(now) {
     render.drawText(timeString, timeFont, textWhite, clockX, clockY);
 }
 
+function drawSteps() {
+    const boxX = 130;
+    const boxY = 148;
+    const boxWidth = 64;
+    const boxHeight = 32;
+
+    drawBox(boxX, boxY, boxWidth, boxHeight, "STEPS");
+
+    const stepsString = String(steps);
+    const stepsWidth = render.getTextWidth(stepsString, stepsFont);
+    const stepsX = boxX + (boxWidth - stepsWidth) / 2;
+    const stepsY = boxY + Math.round((boxHeight - 18) / 2);
+
+    render.drawText(stepsString, stepsFont, textWhite, stepsX, stepsY);
+}
+
 function drawBattery() {
     let batteryPercent = lastBatteryPercent;
     if (batteryPercent > 100) batteryPercent = 100;
@@ -170,6 +189,7 @@ function draw(e) {
     drawBackground();
     drawBattery();
     drawTime(now);
+    drawSteps();
     drawFooter(now);
     render.end();
 }
@@ -195,5 +215,27 @@ try {
     // Fail-silent if hardware/sensor is not available during start
 }
 
+
+
 watch.addEventListener("minutechange", draw);
+
+try {
+    const msg = new Message({
+        keys: ["steps"],
+        onReadable() {
+            try {
+                const data = this.read();
+                if (data.has("steps")) {
+                    steps = data.get("steps");
+                    console.log("JS received steps: " + steps);
+                    draw();
+                }
+            } catch (e) {
+                console.log("Error reading steps message: " + e);
+            }
+        }
+    });
+} catch (err) {
+    console.log("Error starting AppMessage listener: " + err);
+}
 
