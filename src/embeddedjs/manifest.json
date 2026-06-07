@@ -1,5 +1,6 @@
 {
   "modules": {
-    "*": "./main.js"
+    "main": "./main.js",
+    "steps": "./steps.js"
   }
 }

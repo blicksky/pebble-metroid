@@ -35,5 +35,5 @@ void init_health_service(void) {
     health_service_events_subscribe(health_handler, NULL);
 
     // Also set up a periodic timer to update step count (and handle initial display)
-    app_timer_register(2000, timer_callback, NULL); // Start 2 seconds after boot
+    app_timer_register(1500, timer_callback, NULL); // Start 1500ms after boot
 }

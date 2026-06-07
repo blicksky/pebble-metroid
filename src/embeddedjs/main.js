@@ -1,6 +1,6 @@
 import Poco from "commodetto/Poco";
 import Battery from "embedded:sensor/Battery";
-import Message from "pebble/message";
+import Steps from "steps";
 
 const render = new Poco(screen);
 
@@ -26,7 +26,6 @@ const boxSpritesBitmap = new Poco.PebbleBitmap(3);
 
 // Initialize Sensors
 let battery;
-let steps = 0;
 
 // TODO consider moving this into an object with other similar state
 let lastBatteryPercent = 0;
@@ -129,7 +128,7 @@ function drawSteps() {
 
     drawBox(boxX, boxY, boxWidth, boxHeight, "STEPS");
 
-    const stepsString = String(steps);
+    const stepsString = String(Steps.count);
     const stepsWidth = render.getTextWidth(stepsString, stepsFont);
     const stepsX = boxX + (boxWidth - stepsWidth) / 2;
     const stepsY = boxY + Math.round((boxHeight - 18) / 2);
@@ -219,23 +218,13 @@ try {
 
 watch.addEventListener("minutechange", draw);
 
+// Initialize Steps listener
 try {
-    const msg = new Message({
-        keys: ["steps"],
-        onReadable() {
-            try {
-                const data = this.read();
-                if (data.has("steps")) {
-                    steps = data.get("steps");
-                    console.log("JS received steps: " + steps);
-                    draw();
-                }
-            } catch (e) {
-                console.log("Error reading steps message: " + e);
-            }
-        }
-    });
-} catch (err) {
-    console.log("Error starting AppMessage listener: " + err);
+    Steps.init(() => draw());
+} catch (e) {
+    // fail-silent
 }
+
+// Perform initial render immediately on startup using the cached steps
+draw();
 
